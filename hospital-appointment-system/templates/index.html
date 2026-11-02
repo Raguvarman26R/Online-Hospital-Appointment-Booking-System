@@ -1,0 +1,265 @@
+{% extends 'base.html' %}
+
+{% block title %}Home - Online Hospital Appointment System{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="container position-relative">
+        <div class="row align-items-center">
+            <div class="col-lg-7">
+                <span class="hero-badge">
+                    <i class="bi bi-star-fill text-warning"></i> Trusted Healthcare Excellence
+                </span>
+                <h1 class="hero-title mb-3">
+                    Your Health, Our Priority. Book Top Doctors Online.
+                </h1>
+                <p class="hero-subtitle mb-4">
+                    Experience seamless, hassle-free outpatient appointments with verified medical specialists. Connect with experienced physicians, select your preferred time slots, and manage your family's healthcare from anywhere.
+                </p>
+                <div class="d-flex flex-wrap gap-3">
+                    <a href="{{ url_for('doctors') }}" class="btn btn-light btn-lg fw-bold text-primary px-4 shadow">
+                        <i class="bi bi-search me-2"></i> Find a Doctor
+                    </a>
+                    {% if not session.get('user_id') %}
+                    <a href="{{ url_for('register') }}" class="btn btn-outline-light btn-lg fw-semibold px-4">
+                        <i class="bi bi-person-plus me-2"></i> Patient Sign Up
+                    </a>
+                    {% else %}
+                    <a href="{{ url_for('patient_dashboard') if session.get('role') == 'patient' else url_for('doctor_dashboard') if session.get('role') == 'doctor' else url_for('admin_dashboard') }}" class="btn btn-outline-light btn-lg fw-semibold px-4">
+                        <i class="bi bi-speedometer2 me-2"></i> Go to Dashboard
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="col-lg-5 d-none d-lg-block text-center">
+                <div class="p-4 bg-white bg-opacity-10 rounded-4 border border-white border-opacity-25 backdrop-blur shadow-lg">
+                    <div class="brand-icon-box mx-auto mb-3" style="width: 70px; height: 70px; font-size: 2.5rem;">
+                        <i class="bi bi-calendar2-heart"></i>
+                    </div>
+                    <h4 class="text-white fw-bold mb-2">Instant Online Booking</h4>
+                    <p class="text-white text-opacity-75 small mb-4">
+                        Real-time physician schedules, zero waiting in line, instant confirmation.
+                    </p>
+                    <div class="bg-white rounded-3 p-3 text-start shadow-sm text-dark">
+                        <div class="d-flex align-items-center justify-content-between mb-2">
+                            <span class="badge bg-primary">Cardiology OPD</span>
+                            <span class="text-success small fw-bold"><i class="bi bi-circle-fill" style="font-size: 8px;"></i> Available Today</span>
+                        </div>
+                        <div class="fw-bold fs-6">Dr. Aravind Kumar, MD</div>
+                        <div class="text-muted small mb-2">Harvard Medical Specialist</div>
+                        <a href="{{ url_for('book_appointment', doctor_id=1) }}" class="btn btn-sm btn-primary-custom w-100">
+                            Book Slot (10:00 AM)
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Quick Stats Bar -->
+<section class="py-4 bg-white border-bottom shadow-sm">
+    <div class="container">
+        <div class="row g-4 text-center">
+            <div class="col-6 col-md-3">
+                <div class="fw-bolder fs-2 text-primary">50+</div>
+                <div class="text-muted small fw-semibold text-uppercase">Certified Doctors</div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="fw-bolder fs-2 text-primary">15,000+</div>
+                <div class="text-muted small fw-semibold text-uppercase">Patients Served</div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="fw-bolder fs-2 text-primary">10+</div>
+                <div class="text-muted small fw-semibold text-uppercase">Clinical Specialties</div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="fw-bolder fs-2 text-primary">24/7</div>
+                <div class="text-muted small fw-semibold text-uppercase">Emergency Support</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Clinical Specialties Showcase -->
+<section class="py-5">
+    <div class="container">
+        <div class="text-center mb-5">
+            <span class="badge bg-primary-subtle text-primary fw-bold text-uppercase px-3 py-2 rounded-pill">Comprehensive Care</span>
+            <h2 class="fw-bold mt-2 text-dark">Explore Our Medical Specialties</h2>
+            <p class="text-muted mx-auto" style="max-width: 600px;">
+                Specialized departments equipped with the latest diagnostic technology and renowned doctors.
+            </p>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-md-4 col-sm-6">
+                <div class="hospital-card p-4 h-100 text-center">
+                    <div class="stat-icon blue mx-auto mb-3">
+                        <i class="bi bi-heart-pulse"></i>
+                    </div>
+                    <h5 class="fw-bold text-dark mb-2">Cardiology</h5>
+                    <p class="text-muted small mb-3">Advanced cardiovascular assessments, ECG, preventative heart health and hypertension care.</p>
+                    <a href="{{ url_for('doctors', specialty='Cardiology') }}" class="btn btn-sm btn-outline-custom">View Cardiologists</a>
+                </div>
+            </div>
+
+            <div class="col-md-4 col-sm-6">
+                <div class="hospital-card p-4 h-100 text-center">
+                    <div class="stat-icon purple mx-auto mb-3">
+                        <i class="bi bi-lightning-charge"></i>
+                    </div>
+                    <h5 class="fw-bold text-dark mb-2">Neurology</h5>
+                    <p class="text-muted small mb-3">Expert neurological diagnostics for headaches, epilepsy, stroke rehab, and nerve disorders.</p>
+                    <a href="{{ url_for('doctors', specialty='Neurology') }}" class="btn btn-sm btn-outline-custom">View Neurologists</a>
+                </div>
+            </div>
+
+            <div class="col-md-4 col-sm-6">
+                <div class="hospital-card p-4 h-100 text-center">
+                    <div class="stat-icon green mx-auto mb-3">
+                        <i class="bi bi-emoji-smile"></i>
+                    </div>
+                    <h5 class="fw-bold text-dark mb-2">Pediatrics</h5>
+                    <p class="text-muted small mb-3">Compassionate newborn, child and adolescent health, vaccination, and growth monitoring.</p>
+                    <a href="{{ url_for('doctors', specialty='Pediatrics') }}" class="btn btn-sm btn-outline-custom">View Pediatricians</a>
+                </div>
+            </div>
+
+            <div class="col-md-4 col-sm-6">
+                <div class="hospital-card p-4 h-100 text-center">
+                    <div class="stat-icon orange mx-auto mb-3">
+                        <i class="bi bi-activity"></i>
+                    </div>
+                    <h5 class="fw-bold text-dark mb-2">Orthopedics</h5>
+                    <p class="text-muted small mb-3">Joint replacements, fracture trauma management, spine care, and sports medicine.</p>
+                    <a href="{{ url_for('doctors', specialty='Orthopedics') }}" class="btn btn-sm btn-outline-custom">View Orthopedists</a>
+                </div>
+            </div>
+
+            <div class="col-md-4 col-sm-6">
+                <div class="hospital-card p-4 h-100 text-center">
+                    <div class="stat-icon cyan mx-auto mb-3">
+                        <i class="bi bi-droplet-half"></i>
+                    </div>
+                    <h5 class="fw-bold text-dark mb-2">Dermatology</h5>
+                    <p class="text-muted small mb-3">Clinical and cosmetic dermatology, eczema, psoriasis therapies, and skin screening.</p>
+                    <a href="{{ url_for('doctors', specialty='Dermatology') }}" class="btn btn-sm btn-outline-custom">View Dermatologists</a>
+                </div>
+            </div>
+
+            <div class="col-md-4 col-sm-6">
+                <div class="hospital-card p-4 h-100 text-center">
+                    <div class="stat-icon blue mx-auto mb-3">
+                        <i class="bi bi-prescription2"></i>
+                    </div>
+                    <h5 class="fw-bold text-dark mb-2">General Medicine</h5>
+                    <p class="text-muted small mb-3">Primary wellness examinations, chronic condition management, and diagnostic reviews.</p>
+                    <a href="{{ url_for('doctors', specialty='General Medicine') }}" class="btn btn-sm btn-outline-custom">View Physicians</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Featured Doctors Section -->
+<section class="py-5 bg-light border-top border-bottom">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-end mb-4">
+            <div>
+                <span class="badge bg-primary-subtle text-primary fw-bold text-uppercase px-3 py-2 rounded-pill">Top Specialists</span>
+                <h2 class="fw-bold mt-2 text-dark mb-0">Meet Our Featured Doctors</h2>
+            </div>
+            <a href="{{ url_for('doctors') }}" class="btn btn-outline-custom">
+                View All Doctors <i class="bi bi-arrow-right ms-1"></i>
+            </a>
+        </div>
+
+        <div class="row g-4">
+            {% for doctor in featured_doctors %}
+            <div class="col-lg-4 col-md-6">
+                <div class="doctor-card">
+                    <div class="d-flex align-items-center gap-3 mb-3">
+                        <div class="doctor-avatar-box mb-0">
+                            <i class="bi bi-person-fill"></i>
+                        </div>
+                        <div>
+                            <span class="specialty-badge">{{ doctor.specialization }}</span>
+                            <h5 class="fw-bold mb-1 text-dark">{{ doctor.name }}</h5>
+                            <div class="text-muted small"><i class="bi bi-award me-1 text-primary"></i>{{ doctor.qualification }}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="p-3 bg-light rounded-3 mb-3 small">
+                        <div class="d-flex justify-content-between mb-1">
+                            <span class="text-muted">Experience:</span>
+                            <span class="fw-bold">{{ doctor.experience }} Years</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-1">
+                            <span class="text-muted">Consultation Fee:</span>
+                            <span class="fw-bold text-success">₹{{ "%.2f"|format(doctor.consultation_fee) }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <span class="text-muted">Available Days:</span>
+                            <span class="fw-semibold text-truncate ms-2" style="max-width: 170px;">{{ doctor.available_days }}</span>
+                        </div>
+                    </div>
+
+                    <div class="mt-auto d-flex gap-2">
+                        <a href="{{ url_for('doctor_details', doctor_id=doctor.doctor_id) }}" class="btn btn-outline-custom flex-grow-1">
+                            Details
+                        </a>
+                        <a href="{{ url_for('book_appointment', doctor_id=doctor.doctor_id) }}" class="btn btn-primary-custom flex-grow-1">
+                            Book Now
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- How It Works & Patient Benefits -->
+<section class="py-5">
+    <div class="container">
+        <div class="text-center mb-5">
+            <span class="badge bg-primary-subtle text-primary fw-bold text-uppercase px-3 py-2 rounded-pill">Easy Process</span>
+            <h2 class="fw-bold mt-2 text-dark">How It Works in 3 Simple Steps</h2>
+        </div>
+
+        <div class="row g-4 text-center">
+            <div class="col-md-4">
+                <div class="p-4">
+                    <div class="stat-icon blue mx-auto mb-3" style="width: 70px; height: 70px; font-size: 2rem;">
+                        1
+                    </div>
+                    <h5 class="fw-bold mb-2">Find Your Doctor</h5>
+                    <p class="text-muted small">Search by physician name or filter by department to review qualifications and consulting fees.</p>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="p-4">
+                    <div class="stat-icon cyan mx-auto mb-3" style="width: 70px; height: 70px; font-size: 2rem;">
+                        2
+                    </div>
+                    <h5 class="fw-bold mb-2">Select Date & Time</h5>
+                    <p class="text-muted small">Choose an available slot matching the doctor's weekly schedule without double-booking.</p>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="p-4">
+                    <div class="stat-icon green mx-auto mb-3" style="width: 70px; height: 70px; font-size: 2rem;">
+                        3
+                    </div>
+                    <h5 class="fw-bold mb-2">Get Instant Confirmation</h5>
+                    <p class="text-muted small">Receive immediate appointment tracking in your dashboard and visit the clinic hassle-free.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

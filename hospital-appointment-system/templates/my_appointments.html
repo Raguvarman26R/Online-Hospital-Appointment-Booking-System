@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+
+{% block title %}My Appointments - Online Hospital Appointment System{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Header -->
+    <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
+        <div>
+            <h2 class="fw-bold text-dark mb-1">My Appointments History</h2>
+            <p class="text-muted small mb-0">Track all your past, present, and scheduled doctor consultations.</p>
+        </div>
+        <a href="{{ url_for('doctors') }}" class="btn btn-primary-custom">
+            <i class="bi bi-calendar-plus me-1"></i> Book New Appointment
+        </a>
+    </div>
+
+    <!-- Appointments Table Card -->
+    <div class="hospital-card">
+        <div class="hospital-card-header bg-white">
+            <div class="d-flex align-items-center gap-2">
+                <i class="bi bi-calendar2-check text-primary"></i>
+                <span>Registered Appointments ({{ appointments|length }})</span>
+            </div>
+            <div class="small text-muted">
+                Patient ID: #PAT-{{ session.get('user_id') }}
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table hospital-table align-middle">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Doctor</th>
+                        <th>Specialization</th>
+                        <th>Schedule</th>
+                        <th>Reason for Visit</th>
+                        <th>Consultation Fee</th>
+                        <th>Status</th>
+                        <th class="text-end">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if appointments %}
+                        {% for appt in appointments %}
+                        <tr>
+                            <td>
+                                <span class="badge bg-light text-dark border">#APT-{{ appt.appointment_id }}</span>
+                            </td>
+                            <td>
+                                <div class="fw-bold text-dark">{{ appt.doctor_name }}</div>
+                                <div class="text-muted small">{{ appt.doctor_qualification }}</div>
+                            </td>
+                            <td>
+                                <span class="specialty-badge">{{ appt.specialization }}</span>
+                            </td>
+                            <td>
+                                <div class="fw-semibold text-dark"><i class="bi bi-calendar-date text-muted me-1"></i>{{ appt.appointment_date }}</div>
+                                <div class="text-muted small"><i class="bi bi-clock text-muted me-1"></i>{{ appt.appointment_time }}</div>
+                            </td>
+                            <td>
+                                <div class="text-muted text-truncate" style="max-width: 220px;" title="{{ appt.reason }}">
+                                    {{ appt.reason }}
+                                </div>
+                            </td>
+                            <td>
+                                <span class="fw-bold text-success">₹{{ "%.2f"|format(appt.consultation_fee) }}</span>
+                            </td>
+                            <td>
+                                {% if appt.status == 'Confirmed' %}
+                                    <span class="badge-status badge-confirmed"><i class="bi bi-check-circle-fill"></i> Confirmed</span>
+                                {% elif appt.status == 'Pending' %}
+                                    <span class="badge-status badge-pending"><i class="bi bi-hourglass-split"></i> Pending</span>
+                                {% elif appt.status == 'Completed' %}
+                                    <span class="badge-status badge-completed"><i class="bi bi-check-all"></i> Completed</span>
+                                {% elif appt.status == 'Cancelled' or appt.status == 'Rejected' %}
+                                    <span class="badge-status badge-cancelled"><i class="bi bi-x-circle-fill"></i> {{ appt.status }}</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-end">
+                                {% if appt.status in ['Pending', 'Confirmed'] %}
+                                <form action="{{ url_for('cancel_appointment', appointment_id=appt.appointment_id) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to cancel appointment #APT-{{ appt.appointment_id }} with {{ appt.doctor_name }}?');">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger" title="Cancel Appointment">
+                                        <i class="bi bi-x-circle me-1"></i> Cancel
+                                    </button>
+                                </form>
+                                {% else %}
+                                <span class="badge bg-light text-muted border">Closed</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="8" class="text-center py-5 text-muted">
+                                <div class="stat-icon blue mx-auto mb-3" style="width: 60px; height: 60px; font-size: 2rem;">
+                                    <i class="bi bi-calendar-x"></i>
+                                </div>
+                                <h5 class="fw-bold text-dark">No Appointments Found</h5>
+                                <p class="text-muted small mb-3">You do not have any recorded appointments in your profile.</p>
+                                <a href="{{ url_for('doctors') }}" class="btn btn-primary-custom">
+                                    <i class="bi bi-calendar-plus me-1"></i> Book an Appointment Today
+                                </a>
+                            </td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

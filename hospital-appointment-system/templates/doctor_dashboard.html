@@ -1,0 +1,193 @@
+{% extends 'base.html' %}
+
+{% block title %}Doctor Portal - Online Hospital Appointment System{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Doctor Profile Header -->
+    <div class="hospital-card p-4 mb-4 text-white" style="background: linear-gradient(135deg, #198754 0%, #064e3b 100%);">
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
+            <div class="d-flex align-items-center gap-3">
+                <div class="doctor-avatar-box mb-0 bg-white text-success" style="width: 70px; height: 70px; font-size: 2rem;">
+                    <i class="bi bi-heart-pulse-fill"></i>
+                </div>
+                <div>
+                    <span class="badge bg-white text-success fw-bold text-uppercase px-3 py-1 rounded-pill mb-1">Doctor Portal</span>
+                    <h2 class="fw-bold mb-0">{{ doctor.name }}</h2>
+                    <div class="text-white text-opacity-75 small">
+                        {{ doctor.specialization }} &bull; {{ doctor.qualification }} &bull; Fee: ₹{{ "%.2f"|format(doctor.consultation_fee) }}
+                    </div>
+                </div>
+            </div>
+            <div class="text-md-end">
+                <span class="badge bg-light text-dark px-3 py-2 border">
+                    <i class="bi bi-calendar-check text-success me-1"></i> Active Days: {{ doctor.available_days }}
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Doctor Metrics Stats -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-3 col-sm-6">
+            <div class="stat-card">
+                <div class="stat-icon blue">
+                    <i class="bi bi-calendar3"></i>
+                </div>
+                <div>
+                    <div class="stat-number">{{ stats.total }}</div>
+                    <div class="stat-label">Total Appointments</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+            <div class="stat-card">
+                <div class="stat-icon orange">
+                    <i class="bi bi-bell"></i>
+                </div>
+                <div>
+                    <div class="stat-number">{{ stats.pending }}</div>
+                    <div class="stat-label">Pending Requests</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+            <div class="stat-card">
+                <div class="stat-icon cyan">
+                    <i class="bi bi-check-circle"></i>
+                </div>
+                <div>
+                    <div class="stat-number">{{ stats.confirmed }}</div>
+                    <div class="stat-label">Confirmed Upcoming</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+            <div class="stat-card">
+                <div class="stat-icon green">
+                    <i class="bi bi-clipboard2-check"></i>
+                </div>
+                <div>
+                    <div class="stat-number">{{ stats.completed }}</div>
+                    <div class="stat-label">Completed Consults</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Appointment Requests & Patient Details Table -->
+    <div class="hospital-card">
+        <div class="hospital-card-header bg-white">
+            <div class="d-flex align-items-center gap-2">
+                <i class="bi bi-person-lines-fill text-success"></i>
+                <span>Patient Appointment Requests & Schedule</span>
+            </div>
+            <div class="small text-muted">
+                Displaying all scheduled clinical visits
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table hospital-table align-middle">
+                <thead>
+                    <tr>
+                        <th>Appt ID</th>
+                        <th>Patient Details</th>
+                        <th>Schedule</th>
+                        <th>Medical Reason</th>
+                        <th>Current Status</th>
+                        <th class="text-end">Manage Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if appointments %}
+                        {% for appt in appointments %}
+                        <tr>
+                            <td>
+                                <span class="badge bg-light text-dark border">#APT-{{ appt.appointment_id }}</span>
+                            </td>
+                            <td>
+                                <div class="fw-bold text-dark">{{ appt.patient_name }}</div>
+                                <div class="text-muted small">
+                                    <i class="bi bi-person me-1"></i> {{ appt.patient_age }} Yrs, {{ appt.patient_gender }}
+                                </div>
+                                <div class="text-muted small">
+                                    <i class="bi bi-telephone me-1"></i> {{ appt.patient_phone }} &bull; {{ appt.patient_email }}
+                                </div>
+                            </td>
+                            <td>
+                                <div class="fw-semibold text-dark"><i class="bi bi-calendar-event text-muted me-1"></i>{{ appt.appointment_date }}</div>
+                                <div class="text-muted small"><i class="bi bi-clock text-muted me-1"></i>{{ appt.appointment_time }}</div>
+                            </td>
+                            <td>
+                                <div class="p-2 bg-light rounded text-muted small" style="max-width: 250px;">
+                                    {{ appt.reason }}
+                                </div>
+                            </td>
+                            <td>
+                                {% if appt.status == 'Confirmed' %}
+                                    <span class="badge-status badge-confirmed"><i class="bi bi-check-circle-fill"></i> Confirmed</span>
+                                {% elif appt.status == 'Pending' %}
+                                    <span class="badge-status badge-pending"><i class="bi bi-hourglass-split"></i> Pending</span>
+                                {% elif appt.status == 'Completed' %}
+                                    <span class="badge-status badge-completed"><i class="bi bi-check-all"></i> Completed</span>
+                                {% elif appt.status == 'Cancelled' or appt.status == 'Rejected' %}
+                                    <span class="badge-status badge-cancelled"><i class="bi bi-x-circle-fill"></i> {{ appt.status }}</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-end">
+                                <div class="d-flex justify-content-end gap-1 flex-wrap">
+                                    {% if appt.status == 'Pending' %}
+                                    <!-- Accept / Confirm Button -->
+                                    <form action="{{ url_for('doctor_update_status', appointment_id=appt.appointment_id) }}" method="POST" class="d-inline">
+                                        <input type="hidden" name="status" value="Confirmed">
+                                        <button type="submit" class="btn btn-sm btn-success" title="Accept & Confirm Appointment">
+                                            <i class="bi bi-check-lg me-1"></i> Accept
+                                        </button>
+                                    </form>
+                                    <!-- Reject Button -->
+                                    <form action="{{ url_for('doctor_update_status', appointment_id=appt.appointment_id) }}" method="POST" class="d-inline" onsubmit="return confirm('Reject this appointment?');">
+                                        <input type="hidden" name="status" value="Rejected">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger" title="Reject Appointment">
+                                            <i class="bi bi-x-lg me-1"></i> Reject
+                                        </button>
+                                    </form>
+                                    {% elif appt.status == 'Confirmed' %}
+                                    <!-- Mark as Completed Button -->
+                                    <form action="{{ url_for('doctor_update_status', appointment_id=appt.appointment_id) }}" method="POST" class="d-inline">
+                                        <input type="hidden" name="status" value="Completed">
+                                        <button type="submit" class="btn btn-sm btn-primary" title="Mark Consultation Completed">
+                                            <i class="bi bi-check-all me-1"></i> Mark Completed
+                                        </button>
+                                    </form>
+                                    <!-- Cancel Button -->
+                                    <form action="{{ url_for('doctor_update_status', appointment_id=appt.appointment_id) }}" method="POST" class="d-inline" onsubmit="return confirm('Cancel this appointment?');">
+                                        <input type="hidden" name="status" value="Cancelled">
+                                        <button type="submit" class="btn btn-sm btn-outline-secondary" title="Cancel Appointment">
+                                            <i class="bi bi-x-lg me-1"></i> Cancel
+                                        </button>
+                                    </form>
+                                    {% else %}
+                                    <span class="text-muted small">No actions needed</span>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="6" class="text-center py-5 text-muted">
+                                <div class="stat-icon green mx-auto mb-3" style="width: 60px; height: 60px; font-size: 2rem;">
+                                    <i class="bi bi-clipboard-check"></i>
+                                </div>
+                                <h5 class="fw-bold text-dark">No Appointment Requests</h5>
+                                <p class="text-muted small mb-0">You currently have no scheduled or pending patient appointments.</p>
+                            </td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

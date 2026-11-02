@@ -1,0 +1,185 @@
+{% extends 'base.html' %}
+
+{% block title %}Patient Dashboard - Online Hospital Appointment System{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Welcome Header Banner -->
+    <div class="hospital-card p-4 mb-4 bg-gradient text-white" style="background: linear-gradient(135deg, #0d6efd 0%, #063980 100%);">
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
+            <div>
+                <span class="badge bg-white text-primary fw-bold text-uppercase px-3 py-1 rounded-pill mb-2">Patient Portal</span>
+                <h2 class="fw-bold mb-1">Welcome back, {{ patient.name }}!</h2>
+                <p class="mb-0 text-white text-opacity-75 small">
+                    <i class="bi bi-envelope me-1"></i> {{ patient.email }} &nbsp;|&nbsp; 
+                    <i class="bi bi-telephone me-1"></i> {{ patient.phone }} &nbsp;|&nbsp; 
+                    <i class="bi bi-person me-1"></i> {{ patient.age }} Yrs, {{ patient.gender }}
+                </p>
+            </div>
+            <div class="d-flex gap-2">
+                <a href="{{ url_for('doctors') }}" class="btn btn-light fw-bold text-primary shadow-sm">
+                    <i class="bi bi-calendar-plus me-1"></i> Book Appointment
+                </a>
+                <a href="{{ url_for('my_appointments') }}" class="btn btn-outline-light">
+                    <i class="bi bi-clock-history me-1"></i> Full History
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-3 col-sm-6">
+            <div class="stat-card">
+                <div class="stat-icon blue">
+                    <i class="bi bi-calendar-event"></i>
+                </div>
+                <div>
+                    <div class="stat-number">{{ stats.total }}</div>
+                    <div class="stat-label">Total Bookings</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+            <div class="stat-card">
+                <div class="stat-icon orange">
+                    <i class="bi bi-hourglass-split"></i>
+                </div>
+                <div>
+                    <div class="stat-number">{{ stats.pending }}</div>
+                    <div class="stat-label">Pending Approval</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+            <div class="stat-card">
+                <div class="stat-icon cyan">
+                    <i class="bi bi-check2-circle"></i>
+                </div>
+                <div>
+                    <div class="stat-number">{{ stats.confirmed }}</div>
+                    <div class="stat-label">Confirmed Upcoming</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+            <div class="stat-card">
+                <div class="stat-icon green">
+                    <i class="bi bi-clipboard2-check"></i>
+                </div>
+                <div>
+                    <div class="stat-number">{{ stats.completed }}</div>
+                    <div class="stat-label">Completed Visits</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Upcoming & Recent Appointments -->
+        <div class="col-lg-8">
+            <div class="hospital-card">
+                <div class="hospital-card-header">
+                    <span><i class="bi bi-calendar2-week text-primary me-2"></i> Recent & Upcoming Appointments</span>
+                    <a href="{{ url_for('my_appointments') }}" class="btn btn-sm btn-link text-primary text-decoration-none p-0 fw-bold">
+                        View All ({{ stats.total }}) &rarr;
+                    </a>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table hospital-table align-middle">
+                        <thead>
+                            <tr>
+                                <th>Doctor</th>
+                                <th>Specialization</th>
+                                <th>Date & Time</th>
+                                <th>Status</th>
+                                <th class="text-end">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if appointments %}
+                                {% for appt in appointments[:5] %}
+                                <tr>
+                                    <td>
+                                        <div class="fw-bold text-dark">{{ appt.doctor_name }}</div>
+                                        <div class="text-muted small text-truncate" style="max-width: 180px;">{{ appt.reason }}</div>
+                                    </td>
+                                    <td>
+                                        <span class="specialty-badge">{{ appt.specialization }}</span>
+                                    </td>
+                                    <td>
+                                        <div class="fw-semibold text-dark"><i class="bi bi-calendar-date text-muted me-1"></i>{{ appt.appointment_date }}</div>
+                                        <div class="text-muted small"><i class="bi bi-clock text-muted me-1"></i>{{ appt.appointment_time }}</div>
+                                    </td>
+                                    <td>
+                                        {% if appt.status == 'Confirmed' %}
+                                            <span class="badge-status badge-confirmed"><i class="bi bi-check-circle-fill"></i> Confirmed</span>
+                                        {% elif appt.status == 'Pending' %}
+                                            <span class="badge-status badge-pending"><i class="bi bi-hourglass-split"></i> Pending</span>
+                                        {% elif appt.status == 'Completed' %}
+                                            <span class="badge-status badge-completed"><i class="bi bi-check-all"></i> Completed</span>
+                                        {% elif appt.status == 'Cancelled' or appt.status == 'Rejected' %}
+                                            <span class="badge-status badge-cancelled"><i class="bi bi-x-circle-fill"></i> {{ appt.status }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-end">
+                                        {% if appt.status in ['Pending', 'Confirmed'] %}
+                                        <form action="{{ url_for('cancel_appointment', appointment_id=appt.appointment_id) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to cancel this appointment?');">
+                                            <button type="submit" class="btn btn-sm btn-outline-danger" title="Cancel Appointment">
+                                                <i class="bi bi-x-lg me-1"></i> Cancel
+                                            </button>
+                                        </form>
+                                        {% else %}
+                                        <span class="text-muted small">No action</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td colspan="5" class="text-center py-5 text-muted">
+                                        <div class="stat-icon blue mx-auto mb-3" style="width: 50px; height: 50px; font-size: 1.5rem;">
+                                            <i class="bi bi-calendar-x"></i>
+                                        </div>
+                                        <div class="fw-bold mb-1">No appointments found yet</div>
+                                        <p class="small text-muted mb-3">You haven't scheduled any doctor appointments yet.</p>
+                                        <a href="{{ url_for('doctors') }}" class="btn btn-sm btn-primary-custom">
+                                            <i class="bi bi-calendar-plus me-1"></i> Book Your First Appointment
+                                        </a>
+                                    </td>
+                                </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Access & Medical Guidelines -->
+        <div class="col-lg-4">
+            <div class="hospital-card p-4 mb-4">
+                <h5 class="fw-bold text-dark mb-3"><i class="bi bi-compass text-primary me-2"></i> Quick Actions</h5>
+                <div class="d-grid gap-2">
+                    <a href="{{ url_for('doctors') }}" class="btn btn-outline-primary text-start py-2">
+                        <i class="bi bi-search me-2"></i> Browse All Specialists
+                    </a>
+                    <a href="{{ url_for('my_appointments') }}" class="btn btn-outline-secondary text-start py-2">
+                        <i class="bi bi-clock-history me-2"></i> View Past Medical Visits
+                    </a>
+                </div>
+            </div>
+
+            <div class="hospital-card p-4 bg-light border-0">
+                <h6 class="fw-bold text-dark mb-2"><i class="bi bi-info-circle-fill text-primary me-2"></i> Appointment Guidelines</h6>
+                <ul class="text-muted small ps-3 mb-0">
+                    <li class="mb-2">Arrive at least 15 minutes before your scheduled appointment time.</li>
+                    <li class="mb-2">Bring previous medical test records and prescriptions.</li>
+                    <li class="mb-2">Cancellations must be requested at least 2 hours prior to the slot.</li>
+                    <li>For emergencies, please visit our 24/7 Casualty Care unit immediately.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

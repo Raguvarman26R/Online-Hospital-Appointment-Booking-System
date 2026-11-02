@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ doctor.name }} - Doctor Profile | CarePoint Hospital{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('index') }}" class="text-decoration-none">Home</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('doctors') }}" class="text-decoration-none">Doctors</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ doctor.name }}</li>
+        </ol>
+    </nav>
+
+    <div class="row g-4">
+        <!-- Main Doctor Profile Info -->
+        <div class="col-lg-8">
+            <div class="hospital-card p-4 p-md-5 mb-4">
+                <div class="d-flex flex-wrap align-items-center gap-4 mb-4">
+                    <div class="doctor-avatar-box mb-0" style="width: 100px; height: 100px; font-size: 3rem;">
+                        <i class="bi bi-person-fill"></i>
+                    </div>
+                    <div>
+                        <span class="specialty-badge">{{ doctor.specialization }}</span>
+                        <h2 class="fw-bold text-dark mb-1">{{ doctor.name }}</h2>
+                        <div class="text-muted fw-semibold mb-2">
+                            <i class="bi bi-mortarboard-fill text-primary me-1"></i> {{ doctor.qualification }}
+                        </div>
+                        <div class="d-flex flex-wrap gap-2">
+                            <span class="badge bg-light text-dark border">
+                                <i class="bi bi-clock-history me-1 text-primary"></i> {{ doctor.experience }} Years Clinical Experience
+                            </span>
+                            <span class="badge bg-light text-success border">
+                                <i class="bi bi-check-circle me-1"></i> Verified Hospital Specialist
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <hr class="my-4">
+
+                <h5 class="fw-bold text-dark mb-3">Clinical Profile & Specialization</h5>
+                <p class="text-muted leading-relaxed mb-4">
+                    {{ doctor.name }} is a dedicated consultant specialist in the Department of {{ doctor.specialization }} at CarePoint Hospital. With {{ doctor.experience }} years of clinical expertise, Dr. {{ doctor.name.split(' ')[-1] }} is recognized for comprehensive outpatient diagnostics, precision care plans, and patient-first compassionate treatment.
+                </p>
+
+                <div class="row g-3 mb-4">
+                    <div class="col-sm-6">
+                        <div class="p-3 bg-light rounded-3 border">
+                            <div class="text-muted small mb-1"><i class="bi bi-calendar-check text-primary me-1"></i> Consulting Schedule</div>
+                            <div class="fw-bold text-dark">{{ doctor.available_days }}</div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="p-3 bg-light rounded-3 border">
+                            <div class="text-muted small mb-1"><i class="bi bi-cash-stack text-success me-1"></i> Consultation Fee</div>
+                            <div class="fw-bold text-success fs-5">₹{{ "%.2f"|format(doctor.consultation_fee) }} <span class="small text-muted fw-normal">/ visit</span></div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="p-3 bg-light rounded-3 border">
+                            <div class="text-muted small mb-1"><i class="bi bi-envelope text-primary me-1"></i> Doctor Contact</div>
+                            <div class="fw-semibold text-dark">{{ doctor.email }}</div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="p-3 bg-light rounded-3 border">
+                            <div class="text-muted small mb-1"><i class="bi bi-geo-alt text-danger me-1"></i> OPD Location</div>
+                            <div class="fw-semibold text-dark">Wing B, Level 3, Suite {{ doctor.doctor_id + 300 }}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="alert alert-info border-0 d-flex align-items-center mb-0" role="alert">
+                    <i class="bi bi-info-circle-fill text-primary fs-4 me-3"></i>
+                    <div class="small">
+                        <strong>Appointment Notice:</strong> Walk-in queues are strictly prioritized after pre-booked online appointments. Please secure your time slot online below to guarantee your consultation.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Appointment Booking Action Card -->
+        <div class="col-lg-4">
+            <div class="hospital-card p-4 sticky-top" style="top: 90px;">
+                <h5 class="fw-bold text-dark mb-3"><i class="bi bi-calendar-heart text-primary me-2"></i> Book Consultation</h5>
+                <div class="p-3 bg-primary-light rounded-3 border border-primary-subtle mb-3">
+                    <div class="d-flex justify-content-between mb-1">
+                        <span class="text-muted small">Standard Fee:</span>
+                        <span class="fw-bold text-primary">₹{{ "%.2f"|format(doctor.consultation_fee) }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span class="text-muted small">Available On:</span>
+                        <span class="fw-semibold text-dark small">{{ doctor.available_days }}</span>
+                    </div>
+                </div>
+
+                <p class="text-muted small mb-4">
+                    Select your preferred date, convenient morning or afternoon time slot, and tell the doctor the reason for your visit.
+                </p>
+
+                <a href="{{ url_for('book_appointment', doctor_id=doctor.doctor_id) }}" class="btn btn-primary-custom w-100 py-2 fs-6 mb-2">
+                    <i class="bi bi-calendar-plus me-1"></i> Proceed to Book Slot
+                </a>
+                <a href="{{ url_for('doctors') }}" class="btn btn-outline-secondary w-100 py-2 fs-6">
+                    <i class="bi bi-arrow-left me-1"></i> Back to Doctors
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+
+{% block title %}Doctors Directory - Online Hospital Appointment System{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Breadcrumb & Header -->
+    <div class="mb-4">
+        <h2 class="fw-bold text-dark mb-1">Our Medical Specialists</h2>
+        <p class="text-muted small">Search and book consultations with experienced physicians and surgeons.</p>
+    </div>
+
+    <!-- Search & Filter Controls -->
+    <div class="hospital-card p-3 p-md-4 mb-4">
+        <form method="GET" action="{{ url_for('doctors') }}">
+            <div class="row g-3 align-items-center">
+                <div class="col-md-5">
+                    <label class="form-label-custom small">Search by Name or Keyword</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-white text-muted"><i class="bi bi-search"></i></span>
+                        <input type="text" class="form-control form-control-custom" id="doctorSearchInput" name="search" value="{{ search_query }}" placeholder="e.g. Dr. Jenkins or Cardiology...">
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label-custom small">Filter by Specialization</label>
+                    <select class="form-select form-select-custom" id="specialtyFilter" name="specialty">
+                        <option value="">All Specializations ({{ specializations|length }})</option>
+                        {% for spec in specializations %}
+                            <option value="{{ spec }}" {% if selected_specialty == spec %}selected{% endif %}>{{ spec }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="col-md-3 d-flex gap-2 align-items-end" style="padding-top: 24px;">
+                    <button type="submit" class="btn btn-primary-custom flex-grow-1">
+                        <i class="bi bi-funnel-fill me-1"></i> Apply Filter
+                    </button>
+                    {% if search_query or selected_specialty %}
+                    <a href="{{ url_for('doctors') }}" class="btn btn-outline-secondary" title="Clear Filters">
+                        <i class="bi bi-arrow-counterclockwise"></i>
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Doctors Cards Grid -->
+    <div class="row g-4" id="doctorsGrid">
+        {% if doctors %}
+            {% for doctor in doctors %}
+            <div class="col-lg-4 col-md-6 doctor-card-item" data-name="{{ doctor.name }}" data-specialty="{{ doctor.specialization }}">
+                <div class="doctor-card">
+                    <div class="d-flex align-items-center gap-3 mb-3">
+                        <div class="doctor-avatar-box mb-0">
+                            <i class="bi bi-person-fill"></i>
+                        </div>
+                        <div>
+                            <span class="specialty-badge">{{ doctor.specialization }}</span>
+                            <h5 class="fw-bold mb-1 text-dark">{{ doctor.name }}</h5>
+                            <div class="text-muted small"><i class="bi bi-mortarboard me-1 text-primary"></i>{{ doctor.qualification }}</div>
+                        </div>
+                    </div>
+
+                    <div class="p-3 bg-light rounded-3 mb-3 small flex-grow-1">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted"><i class="bi bi-award me-1"></i> Experience:</span>
+                            <span class="fw-bold text-dark">{{ doctor.experience }} Years</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted"><i class="bi bi-cash-stack me-1"></i> Consultation Fee:</span>
+                            <span class="fw-bold text-success">₹{{ "%.2f"|format(doctor.consultation_fee) }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-1">
+                            <span class="text-muted"><i class="bi bi-calendar-week me-1"></i> Available Days:</span>
+                            <span class="fw-semibold text-dark text-truncate ms-2" style="max-width: 170px;" title="{{ doctor.available_days }}">{{ doctor.available_days }}</span>
+                        </div>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <a href="{{ url_for('doctor_details', doctor_id=doctor.doctor_id) }}" class="btn btn-outline-custom flex-grow-1">
+                            <i class="bi bi-info-circle me-1"></i> Details
+                        </a>
+                        <a href="{{ url_for('book_appointment', doctor_id=doctor.doctor_id) }}" class="btn btn-primary-custom flex-grow-1">
+                            <i class="bi bi-calendar-check me-1"></i> Book Slot
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="col-12 text-center py-5">
+                <div class="stat-icon blue mx-auto mb-3" style="width: 60px; height: 60px; font-size: 2rem;">
+                    <i class="bi bi-search"></i>
+                </div>
+                <h4 class="fw-bold text-dark">No Doctors Found</h4>
+                <p class="text-muted mb-3">No medical specialists match your search criteria.</p>
+                <a href="{{ url_for('doctors') }}" class="btn btn-primary-custom">Reset All Filters</a>
+            </div>
+        {% endif %}
+    </div>
+
+    <div id="noDoctorsNotice" class="text-center py-5" style="display: none;">
+        <div class="stat-icon blue mx-auto mb-3" style="width: 60px; height: 60px; font-size: 2rem;">
+            <i class="bi bi-search"></i>
+        </div>
+        <h4 class="fw-bold text-dark">No Matching Doctors</h4>
+        <p class="text-muted">No doctors match your real-time filter.</p>
+    </div>
+</div>
+{% endblock %}

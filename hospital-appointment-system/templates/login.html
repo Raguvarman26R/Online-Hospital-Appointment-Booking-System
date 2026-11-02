@@ -1,0 +1,141 @@
+{% extends 'base.html' %}
+
+{% block title %}Login - Online Hospital Appointment System{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-5 col-md-7">
+            <div class="hospital-card p-4 p-md-5">
+                <div class="text-center mb-4">
+                    <div class="brand-icon-box mx-auto mb-3" style="width: 54px; height: 54px; font-size: 1.75rem;">
+                        <i class="bi bi-shield-lock-fill"></i>
+                    </div>
+                    <h3 class="fw-bold text-dark">Hospital Portal Login</h3>
+                    <p class="text-muted small">Select your role to access your personalized medical portal.</p>
+                </div>
+
+                <!-- Role Selection Tabs -->
+                <ul class="nav nav-pills nav-fill mb-4 p-1 bg-light rounded-3" id="loginRoleTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active fw-bold small py-2" id="patient-tab" data-bs-toggle="pill" data-bs-target="#patient-pane" type="button" role="tab" aria-controls="patient-pane" aria-selected="true">
+                            <i class="bi bi-person me-1"></i> Patient
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link fw-bold small py-2" id="doctor-tab" data-bs-toggle="pill" data-bs-target="#doctor-pane" type="button" role="tab" aria-controls="doctor-pane" aria-selected="false">
+                            <i class="bi bi-heart-pulse me-1"></i> Doctor
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link fw-bold small py-2" id="admin-tab" data-bs-toggle="pill" data-bs-target="#admin-pane" type="button" role="tab" aria-controls="admin-pane" aria-selected="false">
+                            <i class="bi bi-shield-check me-1"></i> Admin
+                        </button>
+                    </li>
+                </ul>
+
+                <div class="tab-content" id="loginRoleTabContent">
+                    <!-- PATIENT LOGIN PANE -->
+                    <div class="tab-pane fade show active" id="patient-pane" role="tabpanel" aria-labelledby="patient-tab">
+                        <div class="mb-3 p-2 bg-light rounded-2 small text-muted d-flex align-items-center justify-content-between">
+                            <span><i class="bi bi-info-circle text-primary me-1"></i> Demo Patient:</span>
+                            <button type="button" class="btn btn-xs demo-chip" onclick="fillCredentials('patient')">
+                                Auto-fill Demo Patient
+                            </button>
+                        </div>
+                        <form action="{{ url_for('login') }}" method="POST">
+                            <input type="hidden" name="role" value="patient">
+                            <div class="mb-3">
+                                <label for="patient_email" class="form-label form-label-custom">Email Address</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light text-muted"><i class="bi bi-envelope"></i></span>
+                                    <input type="email" class="form-control form-control-custom" id="patient_email" name="email" placeholder="patient@example.com" required>
+                                </div>
+                            </div>
+                            <div class="mb-4">
+                                <label for="patient_password" class="form-label form-label-custom">Password</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light text-muted"><i class="bi bi-lock"></i></span>
+                                    <input type="password" class="form-control form-control-custom" id="patient_password" name="password" placeholder="Enter password" required>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-primary-custom w-100 py-2 fs-6 mb-3">
+                                <i class="bi bi-box-arrow-in-right me-2"></i> Sign In as Patient
+                            </button>
+                            <div class="text-center small text-muted">
+                                Don't have a patient account? <a href="{{ url_for('register') }}" class="text-primary fw-bold text-decoration-none">Register Now</a>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- DOCTOR LOGIN PANE -->
+                    <div class="tab-pane fade" id="doctor-pane" role="tabpanel" aria-labelledby="doctor-tab">
+                        <div class="mb-3 p-2 bg-light rounded-2 small text-muted d-flex align-items-center justify-content-between">
+                            <span><i class="bi bi-info-circle text-success me-1"></i> Demo Doctor:</span>
+                            <button type="button" class="btn btn-xs demo-chip" onclick="fillCredentials('doctor')">
+                                Auto-fill Demo Doctor
+                            </button>
+                        </div>
+                        <form action="{{ url_for('login') }}" method="POST">
+                            <input type="hidden" name="role" value="doctor">
+                            <div class="mb-3">
+                                <label for="doctor_email" class="form-label form-label-custom">Doctor Email</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light text-muted"><i class="bi bi-envelope-at"></i></span>
+                                    <input type="email" class="form-control form-control-custom" id="doctor_email" name="email" placeholder="doctor@hospital.com" required>
+                                </div>
+                            </div>
+                            <div class="mb-4">
+                                <label for="doctor_password" class="form-label form-label-custom">Password</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light text-muted"><i class="bi bi-lock"></i></span>
+                                    <input type="password" class="form-control form-control-custom" id="doctor_password" name="password" placeholder="Enter password" required>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-success w-100 py-2 fs-6 mb-3 shadow-sm fw-bold">
+                                <i class="bi bi-box-arrow-in-right me-2"></i> Sign In as Doctor
+                            </button>
+                            <div class="text-center small text-muted">
+                                Doctor accounts are provisioned by hospital administration.
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- ADMIN LOGIN PANE -->
+                    <div class="tab-pane fade" id="admin-pane" role="tabpanel" aria-labelledby="admin-tab">
+                        <div class="mb-3 p-2 bg-light rounded-2 small text-muted d-flex align-items-center justify-content-between">
+                            <span><i class="bi bi-info-circle text-dark me-1"></i> Demo Admin:</span>
+                            <button type="button" class="btn btn-xs demo-chip" onclick="fillCredentials('admin')">
+                                Auto-fill Demo Admin
+                            </button>
+                        </div>
+                        <form action="{{ url_for('login') }}" method="POST">
+                            <input type="hidden" name="role" value="admin">
+                            <div class="mb-3">
+                                <label for="admin_username" class="form-label form-label-custom">Administrator Username</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light text-muted"><i class="bi bi-person-badge"></i></span>
+                                    <input type="text" class="form-control form-control-custom" id="admin_username" name="username" placeholder="admin" required>
+                                </div>
+                            </div>
+                            <div class="mb-4">
+                                <label for="admin_password" class="form-label form-label-custom">Password</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light text-muted"><i class="bi bi-lock"></i></span>
+                                    <input type="password" class="form-control form-control-custom" id="admin_password" name="password" placeholder="Enter password" required>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-dark w-100 py-2 fs-6 mb-3 shadow-sm fw-bold">
+                                <i class="bi bi-box-arrow-in-right me-2"></i> Sign In as Admin
+                            </button>
+                            <div class="text-center small text-muted">
+                                Secure system management console access.
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
